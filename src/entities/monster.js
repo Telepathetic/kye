@@ -20,7 +20,8 @@ export default class Monster extends Interactor {
     const { random, board, entities } = this;
     const nearestPlayer = this.findNearestPlayer();
 
-    this.eatAdjacentPlayers(); // A player may have moved into our orbit. Kill it!
+    this.nibblePlayer(); // A player may have moved into our orbit. Eat part of it!
+    //this.eatAdjacentPlayers(); // A player may have moved into our orbit. Kill it!
     if (random.nextBoolean() && nearestPlayer) {
       const direction = towards(this.coords, nearestPlayer.coords, random);
 
@@ -30,7 +31,7 @@ export default class Monster extends Interactor {
     } else {
       this.move(randomDirection(random));
     }
-    this.eatAdjacentPlayers(); // We may have moved within striking range of a player. Nom.
+    //this.eatAdjacentPlayers(); // We may have moved within striking range of a player. Nom.
   }
 
   findNearestPlayer() {
@@ -44,6 +45,16 @@ export default class Monster extends Interactor {
       }
     }
     return nearestPlayer;
+  }
+
+  nibblePlayer() {
+    let adjacentPlayer;
+    while ((adjacentPlayer = this.findAdjacentPlayer() && adjacentPlayer.state.health > 0)) {
+      adjacentPlayer.state.health -= 1;
+    }
+    if (adjacentPlayer != null && adjacentPlayer.state.health <= 0) {
+      this.eat(adjacentPlayer);
+    }
   }
 
   eatAdjacentPlayers() {
